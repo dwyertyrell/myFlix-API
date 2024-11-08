@@ -9,7 +9,7 @@ app.use(express.static('public'));
 
 
 app.get('/movies', (req,res,) => {
-    res.json('data containing the top 10 movies');
+    res.json(JSON.stringify({'No.1': 'Batman', 'No.2': 'Harry potter', 'No.3':'James Bond'}));
 });
 
 app.get('/', (req,res,) => {
