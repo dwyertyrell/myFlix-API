@@ -1,15 +1,17 @@
 const express = require('express'),
-    morgan = require('morgan');
+    morgan = require('morgan'),
+    bodyParser=require('body-parser');
 const app= express();
 
 app.use(morgan('common'));
+app.use(bodyParser.json())
 
 app.use(express.static('public'));
 
 
 
 app.get('/movies', (req,res,) => {
-    res.json(JSON.stringify({'No.1': 'Batman', 'No.2': 'Harry potter', 'No.3':'James Bond'}));
+    res.json({'No.1': 'Batman', 'No.2': 'Harry potter', 'No.3':'James Bond'});
 });
 
 app.get('/', (req,res,) => {
