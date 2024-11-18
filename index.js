@@ -229,9 +229,9 @@ app.delete('/users/:id', (req, res)=> {
         // if user is truthy, then we change the array, users
 
          users = users.filter(user => user.id != id);
-        res.json(users);
+        res.status(202).send(` ${user.name} is removed successfully`);
     }else {
-        res.send("couldn't remove user" );
+        res.status(404).send(`couldn't remove ${user.name}` );
     }
 });
 
