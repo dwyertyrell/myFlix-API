@@ -62,7 +62,7 @@ app.get('/movies/:title', async(req, res)=> {
 
 // not working
 // 3.Return data about a genre by title
-app.get('movies/genres/:title', (req, res)=> {
+app.get('/movies/genres/:title', (req, res)=> {
     movies.findOne({"genre.title": req.params.title})
     .then((movie)=>{
         const info = movie.genre
@@ -76,7 +76,7 @@ app.get('movies/genres/:title', (req, res)=> {
 
 // not working
 // 4.Return data about a director by name
-app.get('movies/directors/:name', (req,res)=> {
+app.get('/movies/directors/:name', (req,res)=> {
     movies.findOne({"director.name": req.params.name})
     .then((movie)=> {
         const info = movie.director;
