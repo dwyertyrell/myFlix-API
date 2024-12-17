@@ -16,12 +16,17 @@ const app= express();
 app.use(morgan('common'));
 app.use(bodyParser.json());
 
+app.use(bodyParser.urlencoded({extended: true}));
+let auth =require('./auth')(app);
+
+const passport = require('passport');
+require('./passport');
 
 app.get('/', (req, res)=> {
     res.status(201).send('Welcome to my application!');
 });
 
-app.get('/users', async(req, res) => {
+app.get('/users', passport.authenticate('jwt', {session: false}), async(req, res) => {
     await users.find()
     .then((AllUsers) =>{
         res.status(200).json(AllUsers);
@@ -31,7 +36,10 @@ app.get('/users', async(req, res) => {
     });
 });
 
-app.get('/users/:username', async(req, res)=> {
+app.get('/users/:username', passport.authenticate('jwt', {session: false}), async(req, res)=> {
+    if(req.body.username !== req.params.username) {
+        res.status(400).send('permission denied');
+    };
     await users.findOne({username: req.params.username})
     .then((user)=> {
         res.status(200).send(user)
@@ -41,7 +49,7 @@ app.get('/users/:username', async(req, res)=> {
 });
 
 //   1.Return a list of ALL movies to the user
-app.get('/movies', async(req,res)=> {
+app.get('/movies', passport.authenticate('jwt', {session: false}), async(req,res)=> {
     await movies.find()
     .then((movies)=>{
         res.status(200).json(movies);
@@ -52,7 +60,7 @@ app.get('/movies', async(req,res)=> {
 })
 
 //  2.Return data about a single movie by title to the user
-app.get('/movies/:title', async(req, res)=> {
+app.get('/movies/:title', passport.authenticate('jwt', {session: false}), async(req, res)=> {
 
     await movies.find({title: req.params.title})
     .then((movie)=> {
@@ -60,9 +68,9 @@ app.get('/movies/:title', async(req, res)=> {
     })
 });
 
-// not working
+
 // 3.Return data about a genre by title
-app.get('/movies/genres/:title', (req, res)=> {
+app.get('/movies/genres/:title', passport.authenticate('jwt', {session: false}), (req, res)=> {
     movies.findOne({"genre.title": req.params.title})
     .then((movie)=>{
         const info = movie.genre
@@ -74,9 +82,9 @@ app.get('/movies/genres/:title', (req, res)=> {
 });
 
 
-// not working
+
 // 4.Return data about a director by name
-app.get('/movies/directors/:name', (req,res)=> {
+app.get('/movies/directors/:name', passport.authenticate('jwt', {session: false}), (req, res)=> {
     movies.findOne({"director.name": req.params.name})
     .then((movie)=> {
         const info = movie.director;
@@ -116,7 +124,10 @@ app.post('/users', (req, res)=> {
 
 
 // 6.Allow users to update their user info
-app.put('/users/:username', async(req, res)=> {
+app.put('/users/:username', passport.authenticate('jwt', { session: false }), async(req, res)=> {
+    if(req.body.username !== req.params.username) {
+        res.status(400).send('permission denied');
+    };
     await users.findOneAndUpdate(
         {username: req.params.username}, 
         {
@@ -137,7 +148,10 @@ app.put('/users/:username', async(req, res)=> {
         });
 });
 //   7.Allow users to add a movie to their list of favorites
-app.put('/users/:username/:movieId', async(req,res)=> {
+app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req,res)=> {
+    if(req.body.username !== req.params.username) {
+        res.status(400).send('permission denied');
+    };
     await users.findOneAndUpdate({username: req.params.username},
         {$push:{favouriteMovies: req.params.movieId}}, {new: true})  
         .then((user)=>{
@@ -151,7 +165,10 @@ app.put('/users/:username/:movieId', async(req,res)=> {
 
 // screenshot 
 //  8.Allow users to remove a movie from their list of favorites
-app.delete('/users/:username/:movieId', async(req, res)=> {
+app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req, res)=> {
+    if(req.body.username !== req.params.username) {
+        res.status(400).send('permission denied');
+    };
     await users.updateOne(
         {username: req.params.username}, 
         {$pull: {favouriteMovies: req.params.movieId}},
@@ -164,7 +181,10 @@ app.delete('/users/:username/:movieId', async(req, res)=> {
         });
 });
 // 9.Allow existing users to deregister
-app.delete('/users/:username', async(req, res)=> {
+app.delete('/users/:username', passport.authenticate('jwt', {session:false}), async(req, res)=> {
+    if(req.body.username !== req.params.username) {
+        res.status(400).send('permission denied');
+    };
     await users.findOne({username: req.params.username})
     .then((user)=> {
         if(!user){
@@ -184,5 +204,4 @@ app.listen(8080, () => {
 
 
 // update the mongo db:
-//  ISODATE data type to DATE data type.
 // add a description property for the genre (nested) document 
