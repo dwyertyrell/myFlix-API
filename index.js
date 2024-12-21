@@ -3,7 +3,10 @@ const express = require('express'),
     bodyParser=require('body-parser'),
     uuid = require('uuid'),
     mongoose = require('mongoose'),
-    models = require('./models.js');
+    models = require('./models.js'),
+    cors = require('cors');
+
+const {check, validationResult} = require('express-validator');
 
 mongoose.connect('mongodb://localhost:27017/test');
 
@@ -15,9 +18,20 @@ const app= express();
 
 app.use(morgan('common'));
 app.use(bodyParser.json());
+let allowedOrigins = ['https://localhost:8080'];
+app.use(cors({
+    orgin: (origin, callback) => {
+        if(!origin) return callback(null, true);
+        if(allowedOrigins.indexOf(origin) === -1){
+            let message = ' the CORS policy for this application denies access from the origin' + origin;
+            return callback(new Error(message), false);
+        }
+        return callback(null, true);
+    }
+}));
 
 app.use(bodyParser.urlencoded({extended: true}));
-let auth =require('./auth')(app);
+let auth = require('./auth')(app);
 
 const passport = require('passport');
 require('./passport');
@@ -96,7 +110,21 @@ app.get('/movies/directors/:name', passport.authenticate('jwt', {session: false}
 });
 
 // 5.Allow new users to register
-app.post('/users', (req, res)=> {
+app.post('/users', 
+    [
+        check('username', 'username is required').isLength({min: 5}),
+        check('username', 'username contains non alphanumeric characters- not allowed').isAlphanumeric(),
+        check('password','password is required').not().isEmpty(),
+        check('email', 'email is required').isEmail()
+    ], 
+    (req, res) => {
+    
+        let errors = validationResult(req);
+        if(!errors.isEmpty){
+            res.status(422).json({errors: errors.array()});
+        };
+
+    let hashPassword = users.hashPassword(req.body.password);
      users.findOne({username: req.body.username})
     .then((user) => {
         if(user){
@@ -108,17 +136,17 @@ app.post('/users', (req, res)=> {
             lastName: req.body.lastName,
             age: req.body.age,
             username: req.body.username,
-            password: req.body.password,
+            password: hashPassword,
             email:req.body.email,
             birthday:req.body.birthday
         }).then((user) => {
         res.status(201).json(user)        
         }).catch((error) => {
-            res.status(404).send('error:' + error);
+            res.status(500).send('error:' + error);
         })  
     }
     }).catch((error) => {
-    res.status(404).send('error:' + error);
+    res.status(500).send('error:' + error);
     });
 });
 
