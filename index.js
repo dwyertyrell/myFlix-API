@@ -8,7 +8,8 @@ const express = require('express'),
 
 const {check, validationResult} = require('express-validator');
 
-mongoose.connect('mongodb://localhost:27017/test');
+// mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect(process.env.CONNECTION_URI);
 
 // acessing the modules exported from the models.js file, via dot notation.
 const movies = models.movie,
@@ -226,9 +227,11 @@ app.delete('/users/:username', passport.authenticate('jwt', {session:false}), as
     });
 });
 
-app.listen(8080, () => { 
-    console.log('your app is running on port 8080');
-});
+const port = process.env.PORT || 8080;
+
+app.listen(port, '0.0.0.0', () => {
+    console.log('listening on port' + ' '+ port)
+})
 
 
 // update the mongo db:
