@@ -44,7 +44,7 @@ app.get('/', (req, res)=> {
 app.get('/users', passport.authenticate('jwt', {session: false}), async(req, res) => {
     await users.find()
     .then((AllUsers) =>{
-        res.status(200).json(AllUsers);
+        res.status(202).json(AllUsers);
     }).catch((err)=>{
         console.error(err);
         res.status(500).send('error:' + err);
@@ -53,11 +53,11 @@ app.get('/users', passport.authenticate('jwt', {session: false}), async(req, res
 
 app.get('/users/:username', passport.authenticate('jwt', {session: false}), async(req, res)=> {
     if(req.body.username !== req.params.username) {
-        res.status(400).send('permission denied');
+        res.status(401).send('permission denied');
     };
     await users.findOne({username: req.params.username})
     .then((user)=> {
-        res.status(200).send(user)
+        res.status(202).send(user)
     }).catch((err)=>{
         res.status(500).send('error:' + err);
     });
@@ -67,7 +67,7 @@ app.get('/users/:username', passport.authenticate('jwt', {session: false}), asyn
 app.get('/movies', passport.authenticate('jwt', {session: false}), async(req,res)=> {
     await movies.find()
     .then((movies)=>{
-        res.status(200).json(movies);
+        res.status(202).json(movies);
     }).catch((err)=>{
         console.error(err);
         res.status(500).send('Error:' + err);
@@ -79,7 +79,7 @@ app.get('/movies/:title', passport.authenticate('jwt', {session: false}), async(
 
     await movies.find({title: req.params.title})
     .then((movie)=> {
-        res.status(200).json(movie);
+        res.status(220).json(movie);
     })
 });
 
@@ -89,7 +89,7 @@ app.get('/movies/genres/:title', passport.authenticate('jwt', {session: false}),
     movies.findOne({"genre.title": req.params.title})
     .then((movie)=>{
         const info = movie.genre
-        res.status(200).json(info);
+        res.status(202).json(info);
     }).catch((err)=> {
         console.error(err);
         res.status(500).send('error:' + err);
@@ -103,7 +103,7 @@ app.get('/movies/directors/:name', passport.authenticate('jwt', {session: false}
     movies.findOne({"director.name": req.params.name})
     .then((movie)=> {
         const info = movie.director;
-        res.status(200).json(info);
+        res.status(202).json(info);
     }).catch((err)=> {
         console.error(err);
         res.status(500).send('error:' + err);
@@ -129,7 +129,7 @@ app.post('/users',
      users.findOne({username: req.body.username})
     .then((user) => {
         if(user){
-       return res.status(201).send(req.body.username + 'already exists');
+       return res.status(409).send(req.body.username + 'already exists');
     }else {
         // object must be in json format- keys and values in quotations.
         users.create({ 
@@ -155,7 +155,7 @@ app.post('/users',
 // 6.Allow users to update their user info
 app.put('/users/:username', passport.authenticate('jwt', { session: false }), async(req, res)=> {
     if(req.body.username !== req.params.username) {
-        res.status(400).send('permission denied');
+        res.status(401).send('permission denied');
     };
     await users.findOneAndUpdate(
         {username: req.params.username}, 
@@ -184,7 +184,7 @@ app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: fals
     await users.findOneAndUpdate({username: req.params.username},
         {$push:{favouriteMovies: req.params.movieId}}, {new: true})  
         .then((user)=>{
-            res.status(201).send(req.params.movieId + 'added to' + ' ' + req.params.username+'\'s list of movies')
+            res.status(202).send(req.params.movieId + 'added to' + ' ' + req.params.username+'\'s list of movies')
         }).catch((err)=> {
             console.error(err);
             res.status(500).send('error:' + err);
@@ -196,7 +196,7 @@ app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: fals
 //  8.Allow users to remove a movie from their list of favorites
 app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req, res)=> {
     if(req.body.username !== req.params.username) {
-        res.status(400).send('permission denied');
+        res.status(401).send('permission denied');
     };
     await users.updateOne(
         {username: req.params.username}, 
@@ -212,14 +212,14 @@ app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: f
 // 9.Allow existing users to deregister
 app.delete('/users/:username', passport.authenticate('jwt', {session:false}), async(req, res)=> {
     if(req.body.username !== req.params.username) {
-        res.status(400).send('permission denied');
+        res.status(401).send('permission denied');
     };
     await users.findOne({username: req.params.username})
     .then((user)=> {
         if(!user){
-            res.status(400).send(req.params.username + 'does not exist')
+            res.status(404).send(req.params.username + 'does not exist')
         }else{
-            res.status(201).send(req.params.username + ' ' + 'is deleted');
+            res.status(202).send(req.params.username + ' ' + 'is deleted');
         }
     }).catch((err)=> {
         console.error(err);
