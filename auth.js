@@ -38,3 +38,6 @@ module.exports = (router) => {
     });
 }
 
+/* my hashed password in the (user-input field) req.body does work while i try to login with existing user- 
+i must use their un-hashed password. it does, however, work in the parms header of postman.
+ username jeff123 password: raw98 */
