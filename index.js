@@ -8,8 +8,8 @@ const express = require('express'),
 
 const {check, validationResult} = require('express-validator');
 
-mongoose.connect('mongodb://localhost:27017/test');
-// mongoose.connect(process.env.CONNECTION_URI);
+// mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect(process.env.CONNECTION_URI);
 
 // acessing the modules exported from the models.js file, via dot notation.
 const movies = models.movie,
