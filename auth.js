@@ -38,6 +38,14 @@ module.exports = (router) => {
     });
 }
 
-/* my hashed password in the (user-input field) req.body does not work while i try to login with existing user- 
-i must use their un-hashed password. it does, however, work in the parms header of postman.
- username jeff123 password: raw98 */
+/* my hashed password in the (user-input field) req.body does not work while i 
+try to login with existing user- i must use their un-hashed password. it does, 
+however, work in the parms header of postman. username jeff123 password: raw98 
+ 
+ problem- previously added monooge users cannot follow through with endpoing and
+ generate token. but newly created mongoose users can.
+   "username": "immarn123",
+    "password": "lyal123"
+    although it is stored on mongoosh shell terminal, as a hased password, i cannot
+    use the hashed password in postman not find the original after it being hashed 
+    */

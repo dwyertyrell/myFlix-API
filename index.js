@@ -8,8 +8,8 @@ const express = require('express'),
 
 const {check, validationResult} = require('express-validator');
 
-// mongoose.connect('mongodb://localhost:27017/test');
-mongoose.connect(process.env.CONNECTION_URI);
+mongoose.connect('mongodb://localhost:27017/test');
+// mongoose.connect(process.env.CONNECTION_URI);
 
 // acessing the modules exported from the models.js file, via dot notation.
 const movies = models.movie,
@@ -125,19 +125,22 @@ app.post('/users',
             res.status(422).json({errors: errors.array()});
         };
 
-    let hashPassword = users.hashPassword(req.body.password);
+    /*commented out hashed password logic while testing endpoints. i should 
+    advoid commenting, and use an environment variable instead.  */
+    // let hashPassword = users.hashPassword(req.body.password);
      users.findOne({username: req.body.username})
     .then((user) => {
         if(user){
        return res.status(409).send(req.body.username + 'already exists');
-    }else {
+    }else { 
         // object must be in json format- keys and values in quotations.
         users.create({ 
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             age: req.body.age,
             username: req.body.username,
-            password: hashPassword,
+            // password: hashPassword,
+            password: req.body.password,
             email:req.body.email,
             birthday:req.body.birthday
         }).then((user) => {
