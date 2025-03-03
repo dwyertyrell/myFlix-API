@@ -64,7 +64,7 @@ app.get('/users/:username', passport.authenticate('jwt', {session: false}), asyn
 });
 
 //   1.Return a list of ALL movies to the user
-app.get('/movies', async(req,res)=> {
+app.get('/movies', passport.authenticate('jwt', {session: false}), async(req,res)=> {
     await movies.find()
     .then((movies)=>{
         res.status(202).json(movies);
@@ -125,9 +125,8 @@ app.post('/users',
             res.status(422).json({errors: errors.array()});
         };
 
-    /*commented out hashed password logic while testing endpoints. i should 
-    advoid commenting, and use an environment variable instead.  */
-    // let hashPassword = users.hashPassword(req.body.password);
+    
+    let hashPassword = users.hashPassword(req.body.password);
      users.findOne({username: req.body.username})
     .then((user) => {
         if(user){
@@ -139,8 +138,7 @@ app.post('/users',
             lastName: req.body.lastName,
             age: req.body.age,
             username: req.body.username,
-            // password: hashPassword,
-            password: req.body.password,
+            password: hashPassword,
             email:req.body.email,
             birthday:req.body.birthday
         }).then((user) => {
@@ -195,7 +193,7 @@ app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: fals
     });
 
 
-// screenshot 
+ 
 //  8.Allow users to remove a movie from their list of favorites
 app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req, res)=> {
     if(req.body.username !== req.params.username) {

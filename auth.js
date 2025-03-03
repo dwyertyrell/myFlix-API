@@ -6,10 +6,9 @@ const jwt = require('jsonwebtoken'),
 // the local passport.js file
     require('./passport'); 
 
-/* uses LocalStrategy from t*/
 let generateJWTToken = (user) => {
     return jwt.sign(user, jwtSecret, {
-        subject: user.username, /* the username i am encoding*/ 
+        subject: user.username, 
         expiresIn: '7d',
         algorithm: 'HS256'
     });
