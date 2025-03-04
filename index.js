@@ -19,7 +19,7 @@ const app= express();
 
 app.use(morgan('common'));
 app.use(bodyParser.json());
-let allowedOrigins = ['https://localhost:8080'];
+let allowedOrigins = ['https://localhost:8080', 'https://secret-eyrie-53650-99dc45662f12.herokuapp.com'];
 app.use(cors({
     orgin: (origin, callback) => {
         if(!origin) return callback(null, true);
