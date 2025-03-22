@@ -38,3 +38,5 @@ module.exports = (router) => {
 }
 
 
+/*when using the genrated token in the authentication field in postman, 
+remove the quotation */
