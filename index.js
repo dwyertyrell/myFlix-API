@@ -57,7 +57,7 @@ app.get('/users/:username', passport.authenticate('jwt', {session: false}), asyn
     };
     await users.findOne({username: req.params.username})
     .then((user)=> {
-        res.status(202).json(user)
+        res.status(202).send(user)
     }).catch((err)=>{
         res.status(500).send('error:' + err);
     });
