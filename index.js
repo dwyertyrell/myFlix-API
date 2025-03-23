@@ -19,17 +19,17 @@ const app= express();
 
 app.use(morgan('common'));
 app.use(bodyParser.json());
-let allowedOrigins = ['http://localhost:8080', 'https://secret-eyrie-53650-99dc45662f12.herokuapp.com'];
-app.use(cors({
-    orgin: (origin, callback) => {
-        if(!origin) return callback(null, true);
-        if(allowedOrigins.indexOf(origin) === -1){
-            let message = ' the CORS policy for this application denies access from the origin' + origin;
-            return callback(new Error(message), false);
-        }
-        return callback(null, true);
-    }
-}));
+// let allowedOrigins = ['http://localhost:8080', 'https://secret-eyrie-53650-99dc45662f12.herokuapp.com'];
+// app.use(cors({
+//     orgin: (origin, callback) => {
+//         if(!origin) return callback(null, true);
+//         if(allowedOrigins.indexOf(origin) === -1){
+//             let message = ' the CORS policy for this application denies access from the origin' + origin;
+//             return callback(new Error(message), false);
+//         }
+//         return callback(null, true);
+//     }
+// }));
 
 app.use(bodyParser.urlencoded({extended: true}));
 let auth = require('./auth')(app);
@@ -57,7 +57,7 @@ app.get('/users/:username', passport.authenticate('jwt', {session: false}), asyn
     };
     await users.findOne({username: req.params.username})
     .then((user)=> {
-        res.status(202).send(user)
+        res.status(202).json(user)
     }).catch((err)=>{
         res.status(500).send('error:' + err);
     });
