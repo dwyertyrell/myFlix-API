@@ -55,9 +55,6 @@ app.get('/users', passport.authenticate('jwt', {session: false}), async(req, res
 });
 // get user data by their username
 app.get('/users/:username', passport.authenticate('jwt', {session: false}), async(req, res)=> {
-    // if(req.body.username !== req.params.username) {
-    //     res.status(401).send('permission denied');
-    // };
     await users.findOne({username: req.params.username})
     .then((user)=> {
         res.status(202).send(user)
@@ -216,9 +213,9 @@ app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: f
 });
 // 9.Allow existing users to deregister
 app.delete('/users/:username', passport.authenticate('jwt', {session:false}), async(req, res)=> {
-    if(req.body.username !== req.params.username) {
-        res.status(401).send('permission denied');
-    };
+    // if(req.body.username !== req.params.username) {
+    //     res.status(401).send('permission denied');
+    // };
     await users.findOne({username: req.params.username})
     .then((user)=> {
         if(!user){
