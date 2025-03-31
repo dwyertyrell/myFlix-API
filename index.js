@@ -53,11 +53,11 @@ app.get('/users', passport.authenticate('jwt', {session: false}), async(req, res
         res.status(500).send('error:' + err);
     });
 });
-
+// get user data by their username
 app.get('/users/:username', passport.authenticate('jwt', {session: false}), async(req, res)=> {
-    if(req.body.username !== req.params.username) {
-        res.status(401).send('permission denied');
-    };
+    // if(req.body.username !== req.params.username) {
+    //     res.status(401).send('permission denied');
+    // };
     await users.findOne({username: req.params.username})
     .then((user)=> {
         res.status(202).send(user)
