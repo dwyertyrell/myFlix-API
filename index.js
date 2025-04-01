@@ -155,9 +155,9 @@ app.post('/users',
 
 // 6.Allow users to update their user info
 app.put('/users/:username', passport.authenticate('jwt', { session: false }), async(req, res)=> {
-    if(req.body.username !== req.params.username) {
-        res.status(401).send('permission denied');
-    };
+    // if(req.body.username !== req.params.username) {
+    //     res.status(401).send('permission denied');
+    // };
     let hashPassword = users.hashPassword(req.body.password)
     await users.findOneAndUpdate(
         {username: req.params.username}, 
@@ -180,9 +180,7 @@ app.put('/users/:username', passport.authenticate('jwt', { session: false }), as
 });
 //   7.Allow users to add a movie to their list of favorites
 app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req,res)=> {
-    if(req.body.username !== req.params.username) {
-        res.status(400).send('permission denied');
-    };
+    
     await users.findOneAndUpdate({username: req.params.username},
         {$push:{favouriteMovies: req.params.movieId}}, {new: true})  
         .then((user)=>{
@@ -197,9 +195,7 @@ app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: fals
  
 //  8.Allow users to remove a movie from their list of favorites
 app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req, res)=> {
-    if(req.body.username !== req.params.username) {
-        res.status(401).send('permission denied');
-    };
+   
     await users.updateOne(
         {username: req.params.username}, 
         {$pull: {favouriteMovies: req.params.movieId}},
@@ -213,9 +209,7 @@ app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: f
 });
 // 9.Allow existing users to deregister
 app.delete('/users/:username', passport.authenticate('jwt', {session:false}), async(req, res)=> {
-    // if(req.body.username !== req.params.username) {
-    //     res.status(401).send('permission denied');
-    // };
+  
     await users.findOne({username: req.params.username})
     .then((user)=> {
         if(!user){
