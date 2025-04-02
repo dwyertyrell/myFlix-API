@@ -210,12 +210,12 @@ app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: f
 // 9.Allow existing users to deregister
 app.delete('/users/:username', passport.authenticate('jwt', {session:false}), async(req, res)=> {
   
-    await users.findOne({username: req.params.username})
+    await users.deleteOne({username: req.params.username})
     .then((user)=> {
         if(!user){
-            res.status(404).send(req.params.username + 'does not exist')
+            res.status(404).send(`${req.params.username} does not exist`)
         }else{
-            res.status(202).send(req.params.username + ' ' + 'is deleted');
+            res.status(202).send(`${req.params.username} is deleted`);
         }
     }).catch((err)=> {
         console.error(err);
