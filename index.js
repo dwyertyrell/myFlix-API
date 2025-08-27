@@ -1,63 +1,98 @@
+/**
+ * @file index.js
+ * @description Entry point for the myFlix API server. Sets up Express, middleware, routes, and database connection.
+ */
+
 const express = require('express'),
     morgan = require('morgan'),
-    bodyParser=require('body-parser'),
+    bodyParser = require('body-parser'),
     uuid = require('uuid'),
     mongoose = require('mongoose'),
     models = require('./models.js'),
     cors = require('cors');
 
-const {check, validationResult} = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
-// mongoose.connect('mongodb://localhost:27017/test');
+// Connect to MongoDB
 mongoose.connect(process.env.CONNECTION_URI);
 
-// acessing the modules exported from the models.js file, via dot notation.
+// Access models
 const movies = models.movie,
     users = models.user;
-    
-const app= express();
+
+const app = express();
 
 app.use(morgan('common'));
 app.use(bodyParser.json());
+
+/**
+ * Allowed origins for CORS
+ * @type {string[]}
+ */
 let allowedOrigins = [
-    'http://localhost:8080', 
-    'http://localhost:1234', 
+    'http://localhost:8080',
+    'http://localhost:1234',
     'https://voluble-elf-1a3488.netlify.app/',
-    'https://secret-eyrie-53650-99dc45662f12.herokuapp.com'];
+    'https://secret-eyrie-53650-99dc45662f12.herokuapp.com'
+];
+
 app.use(cors({
-    orgin: (origin, callback) => {
-        if(!origin) return callback(null, true);
-        if(allowedOrigins.indexOf(origin) === -1){
-            let message = ' the CORS policy for this application denies access from the origin' + origin;
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            let message = 'The CORS policy for this application denies access from the origin ' + origin;
             return callback(new Error(message), false);
         }
         return callback(null, true);
     }
 }));
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/**
+ * Initialize authentication
+ */
 let auth = require('./auth')(app);
 
 const passport = require('passport');
 require('./passport');
 
-app.get('/', (req, res)=> {
+/**
+ * Root endpoint
+ * @name GET/
+ * @function
+ * @returns {string} Welcome message
+ */
+app.get('/', (req, res) => {
     res.status(201).send('Welcome to my application!');
 });
 
-app.get('/users', passport.authenticate('jwt', {session: false}), async(req, res) => {
+/**
+ * Get all users
+ * @name GET/users
+ * @function
+ * @returns {Array} List of users
+ */
+app.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await users.find()
-    .then((AllUsers) =>{
-        res.status(202).json(AllUsers);
-    }).catch((err)=>{
-        console.error(err);
-        res.status(500).send('error:' + err);
-    });
+        .then((AllUsers) => {
+            res.status(202).json(AllUsers);
+        }).catch((err) => {
+            console.error(err);
+            res.status(500).send('error:' + err);
+        });
 });
-// get user data by their username
-app.get('/users/:username', passport.authenticate('jwt', {session: false}), async(req, res)=> {
-    await users.findOne({username: req.params.username})
-    .then((user)=> {
+
+/**
+ * Get user by username
+ * @name GET/users/:username
+ * @function
+ * @param {string} username - Username to search for
+ * @returns {Object} User object
+ */
+app.get('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    await users.findOne({ username: req.params.username })
+        .then((user) => {
         res.status(202).send(user)
     }).catch((err)=>{
         res.status(500).send('error:' + err);
