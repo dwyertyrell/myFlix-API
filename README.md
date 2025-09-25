@@ -1,73 +1,119 @@
 # myFlix API
 
-Welcome to the myFlix API! This is a RESTful web service for managing movie data and user accounts. It provides endpoints for user registration, authentication, and CRUD operations on movies and users.
+A RESTful API for managing movie data and user accounts, built with Node.js, Express, and MongoDB.
+
+---
 
 ## Table of Contents
 
+- [Overview](#overview)
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [API Endpoints](#api-endpoints)
 - [Authentication](#authentication)
 - [Models](#models)
+- [Error Handling](#error-handling)
 - [Contributing](#contributing)
 - [License](#license)
-- [Documentation](docs/README.md)
+
+---
+
+## Overview
+
+The myFlix API allows users to:
+- Register and manage accounts
+- Browse and search for movies
+- Add or remove favorite movies
+- View information about genres and directors
+
+---
 
 ## Features
 
 - User registration and authentication (JWT)
-- Secure password hashing
-- CRUD operations for movies and users
-- Favorite movies management
-- CORS support
-- Input validation
+- CRUD operations for users and movies
+- Add/remove favorite movies
+- CORS enabled for specific origins
+- Input validation and error handling
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js
-- MongoDB database
+- [Node.js](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/)
+- [npm](https://www.npmjs.com/)
 
 ### Installation
 
-1. Clone the repository:
-	```sh
-	git clone https://github.com/dwyertyrell/myFlix-API.git
-	```
-2. Install dependencies:
-	```sh
-	npm install
-	```
-3. Set up your environment variables (see `.env.example`):
-	- `CONNECTION_URI` for MongoDB
-	- `JWT_SECRET` for authentication
-4. Start the server:
-	```sh
-	npm start
-	```
+```bash
+git clone https://github.com/yourusername/myFlix-API.git
+cd myFlix-API
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file in the root directory and add:
+
+```
+CONNECTION_URI=your_mongodb_connection_string
+PORT=8080
+```
+
+### Running the Server
+
+```bash
+npm start
+```
+
+---
 
 ## API Endpoints
 
-See [docs/api-endpoints.md](docs/api-endpoints.md) for a full list of endpoints, request/response formats, and usage examples.
+See [docs/api-endpoints.md](docs/api-endpoints.md) for full documentation.
+
+**Examples:**
+
+- `GET /movies` — Get all movies
+- `GET /movies/:title` — Get a movie by title
+- `POST /users` — Register a new user
+- `PUT /users/:username` — Update user info
+- `PUT /users/:username/:movieId` — Add a movie to favorites
+- `DELETE /users/:username/:movieId` — Remove a movie from favorites
+
+---
 
 ## Authentication
 
-Authentication is handled via JWT. See [docs/authentication.md](docs/authentication.md) for details on login, token usage, and securing endpoints.
+- Uses JWT for protected routes.
+- Register and log in to receive a token.
+- Include the token in the `Authorization` header as `Bearer <token>`.
+
+---
 
 ## Models
 
-The API uses Mongoose models for `Movie` and `User`. See [docs/models.md](docs/models.md) for schema details.
+See [docs/models.md](docs/models.md) for detailed schema information.
+
+---
+
+## Error Handling
+
+- Returns appropriate HTTP status codes and error messages for invalid requests or server errors.
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please see [docs/contributing.md](docs/contributing.md) for guidelines.
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+See [docs/contributing.md](docs/contributing.md) for guidelines.
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
-
-## Documentation
-
-For detailed documentation, see the [docs/](docs/README.md) directory.
-
+[MIT](LICENSE)
