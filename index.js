@@ -13,13 +13,24 @@ const express = require('express'),
 
 const { check, validationResult } = require('express-validator');
 
+/**
+ * Connect to MongoDB database using environment variable
+ */
 // Connect to MongoDB
 mongoose.connect(process.env.CONNECTION_URI);
 
+/**
+ * Access models from models.js
+ * @type {Object}
+ */
 // Access models
 const movies = models.movie,
     users = models.user;
 
+/**
+ * Express application instance
+ * @type {Object}
+ */
 const app = express();
 
 app.use(morgan('common'));
@@ -99,7 +110,12 @@ app.get('/users/:username', passport.authenticate('jwt', { session: false }), as
     });
 });
 
-//   1.Return a list of ALL movies to the user
+/**
+ * Get all movies
+ * @name GET/movies
+ * @function
+ * @returns {Array} List of all movies
+ */
 app.get('/movies', passport.authenticate('jwt', {session: false}), async(req,res)=> {
     await movies.find()
     .then((movies)=>{
@@ -110,7 +126,13 @@ app.get('/movies', passport.authenticate('jwt', {session: false}), async(req,res
     });
 })
 
-//  2.Return data about a single movie by title to the user
+/**
+ * Get movie by title
+ * @name GET/movies/:title
+ * @function
+ * @param {string} title - Movie title to search for
+ * @returns {Object} Movie object
+ */
 app.get('/movies/:title', passport.authenticate('jwt', {session: false}), async(req, res)=> {
 
     await movies.find({title: req.params.title})
@@ -119,8 +141,13 @@ app.get('/movies/:title', passport.authenticate('jwt', {session: false}), async(
     })
 });
 
-
-// 3.Return data about a genre by title
+/**
+ * Get genre information by title
+ * @name GET/movies/genres/:title
+ * @function
+ * @param {string} title - Genre title to search for
+ * @returns {Object} Genre information
+ */
 app.get('/movies/genres/:title', passport.authenticate('jwt', {session: false}), (req, res)=> {
     movies.findOne({"genre.title": req.params.title})
     .then((movie)=>{
@@ -132,9 +159,13 @@ app.get('/movies/genres/:title', passport.authenticate('jwt', {session: false}),
     });
 });
 
-
-
-// 4.Return data about a director by name
+/**
+ * Get director information by name
+ * @name GET/movies/directors/:name
+ * @function
+ * @param {string} name - Director name to search for
+ * @returns {Object} Director information
+ */
 app.get('/movies/directors/:name', passport.authenticate('jwt', {session: false}), (req, res)=> {
     movies.findOne({"director.name": req.params.name})
     .then((movie)=> {
@@ -146,7 +177,19 @@ app.get('/movies/directors/:name', passport.authenticate('jwt', {session: false}
     });
 });
 
-// 5.Allow new users to register
+/**
+ * Register a new user
+ * @name POST/users
+ * @function
+ * @param {string} username - Username (minimum 5 characters, alphanumeric)
+ * @param {string} password - Password (required)
+ * @param {string} email - Email address (required)
+ * @param {string} firstName - First name
+ * @param {string} lastName - Last name
+ * @param {number} age - Age
+ * @param {Date} birthday - Birthday
+ * @returns {Object} Created user object
+ */
 app.post('/users', 
     [
         check('username', 'username is required').isLength({min: 5}),
@@ -188,12 +231,21 @@ app.post('/users',
     });
 });
 
-
-// 6.Allow users to update their user info
+/**
+ * Update user information
+ * @name PUT/users/:username
+ * @function
+ * @param {string} username - Username to update
+ * @param {string} firstName - Updated first name (optional)
+ * @param {string} lastName - Updated last name (optional)
+ * @param {number} age - Updated age (optional)
+ * @param {string} password - Updated password (optional)
+ * @param {string} email - Updated email (optional)
+ * @param {Date} birthday - Updated birthday (optional)
+ * @returns {Object} Updated user object
+ */
 app.put('/users/:username', passport.authenticate('jwt', { session: false }), async(req, res)=> {
-    // if(req.body.username !== req.params.username) {
-    //     res.status(401).send('permission denied');
-    // };
+    
     let hashPassword = users.hashPassword(req.body.password)
     await users.findOneAndUpdate(
         {username: req.params.username}, 
@@ -214,7 +266,15 @@ app.put('/users/:username', passport.authenticate('jwt', { session: false }), as
             res.status(500).send('error:' + err);
         });
 });
-//   7.Allow users to add a movie to their list of favorites
+
+/**
+ * Add movie to user's favorites list
+ * @name PUT/users/:username/:movieId
+ * @function
+ * @param {string} username - Username
+ * @param {string} movieId - Movie ID to add to favorites
+ * @returns {string} Success message
+ */
 app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req,res)=> {
     
     await users.findOneAndUpdate({username: req.params.username},
@@ -227,9 +287,14 @@ app.put('/users/:username/:movieId', passport.authenticate('jwt', {session: fals
         });
     });
 
-
- 
-//  8.Allow users to remove a movie from their list of favorites
+/**
+ * Remove movie from user's favorites list
+ * @name DELETE/users/:username/:movieId
+ * @function
+ * @param {string} username - Username
+ * @param {string} movieId - Movie ID to remove from favorites
+ * @returns {Object} Updated user object
+ */
 app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: false}), async(req, res)=> {
    
     await users.updateOne(
@@ -243,7 +308,14 @@ app.delete('/users/:username/:movieId', passport.authenticate('jwt', {session: f
             res.status(500).send('error:' + err);
         });
 });
-// 9.Allow existing users to deregister
+
+/**
+ * Delete user account
+ * @name DELETE/users/:username
+ * @function
+ * @param {string} username - Username to delete
+ * @returns {string} Success or error message
+ */
 app.delete('/users/:username', passport.authenticate('jwt', {session:false}), async(req, res)=> {
   
     await users.deleteOne({username: req.params.username})
@@ -259,12 +331,19 @@ app.delete('/users/:username', passport.authenticate('jwt', {session:false}), as
     });
 });
 
+/**
+ * Server port configuration
+ * @type {number}
+ */
 const port = process.env.PORT || 8080;
 
+/**
+ * Start the server
+ * @function
+ * @param {number} port - Port number to listen on
+ * @param {string} host - Host address (0.0.0.0)
+ * @param {Function} callback - Callback function when server starts
+ */
 app.listen(port, '0.0.0.0', () => {
     console.log('listening on port' + ' '+ port)
 })
-
-
-// update the mongo db:
-// add a description property for the genre (nested) document 
