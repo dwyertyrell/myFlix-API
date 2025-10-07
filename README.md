@@ -57,10 +57,11 @@ npm install
 ### Environment Variables
 
 Create a `.env` file in the root directory and add:
+Although This goes against the normal security on industry level, due to this being only a demo project, i am willing to reveal the mongodb environment variable value, for any contributors.
 
+Therefore, there would be no need to create an `.en` file for the environment variable.
 ```
-CONNECTION_URI=your_mongodb_connection_string
-PORT=8080
+CONNECTION_URI=mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api
 ```
 
 ### Running the Server

@@ -17,7 +17,9 @@ const { check, validationResult } = require('express-validator');
  * Connect to MongoDB database using environment variable
  */
 // Connect to MongoDB
-mongoose.connect(process.env.CONNECTION_URI);
+// mongoose.connect(process.env.CONNECTION_URI);
+mongoose.connect('mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api')
+
 
 /**
  * Access models from models.js
