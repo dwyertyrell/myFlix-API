@@ -18,7 +18,8 @@ const { check, validationResult } = require('express-validator');
  */
 // Connect to MongoDB
 // mongoose.connect(process.env.CONNECTION_URI);
-mongoose.connect('mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api')
+// mongoose.connect('mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api')
+mongoose.connect('mongodb://172.31.11.176/mongodb-server')
 
 
 /**
