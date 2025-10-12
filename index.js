@@ -338,7 +338,8 @@ app.delete('/users/:username', passport.authenticate('jwt', {session:false}), as
  * Server port configuration
  * @type {number}
  */
-const port = process.env.PORT || 8080;
+// const port = process.env.PORT || 8080 ;
+const port = process.env.PORT || 3000
 
 /**
  * Start the server
