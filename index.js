@@ -23,7 +23,7 @@ const { check, validationResult } = require('express-validator');
 */
 const mongoUri = process.env.MONGO_AWS_URI ? process.env.MONGO_AWS_URI : process.env.CONNECTION_URI 
 
-mongoose.Connect(mongoUri)
+mongoose.connect(mongoUri)
 
 
 /**
