@@ -56,20 +56,18 @@ npm install
 
 ### Environment Variables
 
-Create a `.env` file in the root directory and add:
-Although This goes against the normal security on industry level, due to this being only a demo project, i am willing to reveal the mongodb environment variable value, for any contributors.
-
-Therefore, there would be no need to create an `.en` file for the environment variable.
-```
-CONNECTION_URI=mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api
-```
+  Environment variables are set in Heroku Config Vars for production deployment
+  Uses ternary operator to check for availability of connection strings 
+ 
+  Priority order:
+  1. `process.env.MONGO_AWS_URI` - MongoDB on EC2 instance (AWS)
+  2. `process.env.CONNECTION_URI` - MongoDB Atlas Connection
 
 ### Running the Server
 
 ```bash
 npm start
 ```
-
 ---
 
 ## API Endpoints

@@ -14,11 +14,16 @@ const express = require('express'),
 const { check, validationResult } = require('express-validator');
 
 /**
- * Connect to MongoDB database using environment variable
- */
+ * Environment variables are set in Heroku Config Vars for production deployment
+ * Uses ternary operator to check for availability of connection strings 
+ 
+ * Priority order:
+ * 1. process.env.MONGO_AWS_URI - MongoDB on EC2 instance (AWS)
+ * 2. process.env.CONNECTION_URI - MongoDB Atlas Connection
+*/
+const mongoUri = process.env.MONGO_AWS_URI ? process.env.MONGO_AWS_URI : process.env.CONNECTION_URI 
 
-// mongoose.connect(process.env.CONNECTION_URI); // connecting to mongoDB via atlas
-mongoose.connect(process.env.MONGO_URI) // connecting to mongoDB via EC2 instance on AWS
+mongoose.Connect(mongoUri)
 
 
 /**
