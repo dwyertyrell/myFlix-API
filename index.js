@@ -3,6 +3,8 @@
  * @description Entry point for the myFlix API server. Sets up Express, middleware, routes, and database connection.
  */
 
+require('dotenv').config();
+
 const express = require('express'),
     morgan = require('morgan'),
     bodyParser = require('body-parser'),
