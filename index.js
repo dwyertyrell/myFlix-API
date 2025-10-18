@@ -51,6 +51,7 @@ app.use(bodyParser.json());
  */
 let allowedOrigins = [
     'http://localhost:8080',
+    'https://myflix-frontend-dwyertyrell.s3.eu-west-2.amazonaws.com',
     'http://localhost:1234',
     'https://voluble-elf-1a3488.netlify.app/',
     'https://secret-eyrie-53650-99dc45662f12.herokuapp.com'
