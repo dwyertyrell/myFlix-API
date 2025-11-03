@@ -20,10 +20,11 @@ const { check, validationResult } = require('express-validator');
  * Uses ternary operator to check for availability of connection strings 
  
  * Priority order:
- * 1. process.env.MONGO_AWS_URI - MongoDB on EC2 instance (AWS)
- * 2. process.env.CONNECTION_URI - MongoDB Atlas Connection
+ * 1. process.env.CONNECTION_URI - MongoDB Atlas Connection
+ * 2. connection string for MongoDB on EC2 instance (AWS)
+
 */
-const mongoUri = process.env.MONGO_AWS_URI ? process.env.MONGO_AWS_URI : process.env.CONNECTION_URI 
+const mongoUri = process.env.CONNECTION_URI? process.env.CONNECTION_URI :  'mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api'
 
 mongoose.connect(mongoUri)
 
