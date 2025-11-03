@@ -24,7 +24,7 @@ const { check, validationResult } = require('express-validator');
  * 2. connection string for MongoDB on EC2 instance (AWS)
 
 */
-const mongoUri = process.env.CONNECTION_URI? process.env.CONNECTION_URI :  'mongodb+srv://football89:basketball@movie-api.dmxnt.mongodb.net/myflixDB?retryWrites=true&w=majority&appName=movie-api'
+const mongoUri = process.env.CONNECTION_URI? process.env.CONNECTION_URI :  'mongodb://10.0.0.8:27017/myflixDB'
 
 mongoose.connect(mongoUri)
 
