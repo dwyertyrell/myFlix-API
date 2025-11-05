@@ -3,7 +3,7 @@
  * @description Entry point for the myFlix API server. Sets up Express, middleware, routes, and database connection.
  */
 
-require('dotenv').config();
+// require('dotenv').config();
 
 const express = require('express'),
     morgan = require('morgan'),
@@ -24,7 +24,7 @@ const { check, validationResult } = require('express-validator');
  * 2. connection string for MongoDB on EC2 instance (AWS)
 
 */
-const mongoUri = process.env.CONNECTION_URI? process.env.CONNECTION_URI :  'mongodb://10.0.0.8:27017/myflixDB'
+const mongoUri = process.env.CONNECTION_URI? process.env.CONNECTION_URI :  'mongodb://10.0.0.9:27017/myflixDB'
 
 mongoose.connect(mongoUri)
 
