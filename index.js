@@ -356,6 +356,9 @@ const port = process.env.PORT || 3000
  * @param {string} host - Host address (0.0.0.0)
  * @param {Function} callback - Callback function when server starts
  */
-app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, '0.0.0.0', () => {
     console.log('listening on port' + ' '+ port)
 })
+
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
