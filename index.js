@@ -3,7 +3,7 @@
  * @description Entry point for the myFlix API server. Sets up Express, middleware, routes, and database connection.
  */
 
-// require('dotenv').config();
+require('dotenv').config();
 
 const express = require('express'),
     morgan = require('morgan'),
@@ -14,6 +14,25 @@ const express = require('express'),
     cors = require('cors');
 
 const { check, validationResult } = require('express-validator');
+const { S3Client, ListObjectsV2Command, PutObjectCommand } = require('@aws-sdk/client-s3')
+
+const fs = require('fs')
+const path = require('path')
+const fileupload = require('express-fileupload')
+
+const s3Client = new S3Client({
+    region: 'us-east-1',
+    endpoint: 'http://localhost:4566',
+    forcePathStyle: true
+})
+
+const listObjectsParams = {
+    Bucket: 'my-cool-local-bucket'
+}
+
+const listObjectsCmd = new ListObjectsV2Command(listObjectsParams)
+
+s3Client.send(listObjectsCmd)
 
 /**
  * Environment variables are set in Heroku Config Vars for production deployment
@@ -24,6 +43,7 @@ const { check, validationResult } = require('express-validator');
  * 2. connection string for MongoDB on EC2 instance (AWS)
 
 */
+
 const mongoUri = process.env.CONNECTION_URI? process.env.CONNECTION_URI :  'mongodb://10.0.0.9:27017/myflixDB'
 
 mongoose.connect(mongoUri)
@@ -45,6 +65,10 @@ const app = express();
 
 app.use(morgan('common'));
 app.use(bodyParser.json());
+app.use(fileupload({
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
+}))
 
 /**
  * Allowed origins for CORS
@@ -88,6 +112,94 @@ require('./passport');
 app.get('/', (req, res) => {
     res.status(201).send('Welcome to my application!');
 });
+
+// endpoint for fetching list of objects from localstack s3 bucket
+/**
+ * List objects in s3 bucket
+ * @name GET /s3/list
+ * @function
+ * @returns {object} list of objects in the bucket
+ */
+app.get(`/s3/list`, async (req, res) => {
+    try {
+        const response = await s3Client.send(listObjectsCmd);
+        res.status(200).json({
+            success: true,
+            bucketName: listObjectsParams.Bucket,
+            objects: response.Contents || [],
+            count: response.KeyCount || 0
+        })
+    }
+    catch (error) {
+        console.error('Error listing s3 objects:', error)
+        res.status(500).json({
+            success: false,
+            error: 'Failed to list s3 objects',
+            details: error.message
+        })
+    }
+})
+
+app.post('/s3/upload', async (req, res) => {
+    try {
+        //check if files were uploaded
+        if( !req.files || !req.files.file) {
+            return res.status(400).json({
+                success: false,
+                error: 'no file uploaded'
+            })
+        }
+
+    const uploadedFile = req.files.file
+    const fileName = uploadedFile.name
+    const tempFilePath = uploadedFile.tempFilePath
+
+    //read file from temporary location
+    const fileBuffer = fs.readFileSync(tempFilePath)
+
+    //prepare s3 upload parameters
+    const uploadParams = {
+        Bucket: 'my-cool-local-bucket',
+        Key: fileName,
+        Body: fileBuffer,
+        ContentType: uploadedFile.mimetype
+    }
+
+    //upload to s3
+    const uploadCommand = new PutObjectCommand(uploadParams)
+    const uploadResult = await s3Client.send(uploadCommand)
+
+    //clean up temporary file
+    fs.unlinkSync(tempFilePath)
+
+    res.status(200).json({
+        success: true,
+        message: 'File upload successfully',
+        fileName: fileName,
+        bucketName: uploadParams.Bucket,
+        etag: uploadResult.ETag
+    })
+
+
+} catch (error) {
+    console.error('Error uploading file to S3', error)
+
+    //clean up temporary file if it exists
+    if(req.files && req.files.file && req.files.file.tempFilePath ){ 
+        try {
+        fs.unlinkSync(req.files.file.tempFilePath )
+    } catch (cleanupError) {
+        console.error('Error cleaning up temp File:', cleanupError)
+        }
+    }
+    res.status(500).json({
+        success: false,
+        error: 'failed to upload file to S3',
+        details: error.message
+    })
+}
+})
+
 
 /**
  * Get all users
@@ -346,7 +458,6 @@ app.delete('/users/:username', passport.authenticate('jwt', {session:false}), as
  * Server port configuration
  * @type {number}
  */
-// const port = process.env.PORT || 8080 ;
 const port = process.env.PORT || 3000
 
 /**

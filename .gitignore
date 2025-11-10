@@ -1,3 +1,5 @@
 /node_modules
 /.vscode
 /exported_mongo_database
+/.env
+/package-lock.json
