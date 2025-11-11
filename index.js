@@ -21,13 +21,13 @@ const path = require('path')
 const fileupload = require('express-fileupload')
 
 const s3Client = new S3Client({
-    region: 'us-east-1',
-    endpoint: 'http://localhost:4566',
-    forcePathStyle: true
+    region: process.env.AWS_REGION || 'us-east-1',
+    // endpoint: 'http://localhost:4566',
+    // forcePathStyle: true
 })
 
 const listObjectsParams = {
-    Bucket: 'my-cool-local-bucket'
+    Bucket: process.env.S3_BUCKET_NAME || 'my-image-bucket-dwyertyrell'
 }
 
 const listObjectsCmd = new ListObjectsV2Command(listObjectsParams)
@@ -159,7 +159,7 @@ app.post('/s3/upload', async (req, res) => {
 
     //prepare s3 upload parameters
     const uploadParams = {
-        Bucket: 'my-cool-local-bucket',
+        Bucket: process.env.S3_BUCKET_NAME,
         Key: fileName,
         Body: fileBuffer,
         ContentType: uploadedFile.mimetype
